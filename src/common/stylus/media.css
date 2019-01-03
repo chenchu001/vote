@@ -1,0 +1,9 @@
+@media screen and (max-width:1500px){
+    .login-title {
+        top: 7% !important;
+    }
+    .login-form {
+        top: 36% !important;
+        height: 356px !important;
+    }
+}
