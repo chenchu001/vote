@@ -1,8 +1,8 @@
 <template>
     <div id="app">
-        <keep-alive>
+        <!-- <keep-alive> -->
             <router-view />
-        </keep-alive>
+        <!-- </keep-alive> -->
     </div>
 </template>
 
@@ -12,6 +12,6 @@
         height: 100%
     #app
         width: 100%
-        max-width: 7.5rem
+        max-width: 8.3rem
         margin: 0 auto
 </style>

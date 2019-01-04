@@ -28,13 +28,13 @@
 
 <style lang="stylus">
     .v-footer
-        width: 7.5rem
+        width: 8.3rem
         height: 1.14rem
         background: #0255c7
         position: fixed
         bottom: 0
         left: 50%
-        margin-left: -3.75rem
+        margin-left: -4.15rem
         display: flex
         .item
             display: flex

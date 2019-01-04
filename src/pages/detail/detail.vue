@@ -2,47 +2,86 @@
     <div class="detail">
         <div class="detail-title">
             <h5>事件名称</h5>
-            <p>省政府领导对我省食品药品安全工作作出重要批示</p>
+            <p>{{detailObj.title}}</p>
             <div class="title-info">
                 <div class="left">
-                    <span class="text">NO.1</span>
-                    <span class="piao">20000</span>票
+                    <span class="text">NO.{{detailObj.paiming}}</span>
+                    <span class="piao">{{detailObj.vcount}}</span>票
                 </div>
                 <div class="right">
-                    <span class="text" v-show="checked === 0">选择</span>
-                    <span class="text-checked" v-show="checked === 1">已选择</span>
+                    <span class="text" v-show="checked === 0" @click="handleClickCheck">选择</span>
+                    <span class="text-checked" v-show="checked === 1" @click.stop="handleClickCancel">已选择</span>
                 </div>
             </div>
         </div>
         <div class="detail-info">
             <h5>事件详情</h5>
-            <img src="https://p2.hbtv.com.cn/sketch3/js/plugins/umeditor/php2/upload/20180119/15163313303668.jpg" alt="" />
-            <p>省委书记蒋超良对食品安全工作作出批示强调，“食品安全关系每个人的身体健康和生命安全，是全面建成小康社会的重要标志。面对当前依然十分严峻的食品安全形势，面对老百姓吃得放心、安心的期盼，各级党委、政府及有关部门要把食品安全作为一项重大政治任务和民生工程来抓，坚决贯彻落实习近平总书记关于食品安全工作的重要指示精神，牢固树立以人民为中心的发展理念，坚持党政同责、标本兼治，进一步夯实各方面、各环节的责任，落实‘四个最严’要求，不断提高食品安全监管水平和能力，切实保障人民群众‘舌尖上的安全’。”</p>
-            <p>省委副书记、省长王晓东对食品安全工作作出批示强调，“食品安全关系国计民生，责任重于泰山，各地、各部门要认真贯彻落实习近平总书记重要指示、李克强总理重要批示精神，按照国务院食安委第四次全体会议要求，牢固树立以人民为中心的发展理念，始终把食品安全摆在突出重要的位置，时刻把责任记在心上、扛在肩上、抓在手上，下定决心、坚定信心、保持恒心，加快建立科学完善的食品安全治理体系。要突出问题导向，补齐发展短板，创新监管方式，加强能力建设，严格源头管控，坚持综合施策，在抓严、抓细、抓实上下功夫、见成效，严把从农田到餐桌的每一道防线，确保人民群众‘舌尖上的安全’，全面提升我省食品安全保障水平。”</p>
+            <img :src="detailObj.pic" alt="" />
+            <p v-html="detailObj.content"></p>
         </div>
         <!-- return -->
         <a href="javascript:;" class="return" @click.stop="returnVote"></a>
-        <v-shop></v-shop>
+        <v-shop v-on:clearDatas="clearDatas"></v-shop>
     </div>
 </template>
 
 <script>
     import VShop from 'base/v-shop/v-shop'
+    import axios from 'axios'
 
     export default {
         name: "detail",
         data () {
             return {
-                checked: 0
+                checked: 0,
+                arr: [],
+                id: 0,
+                detailObj: {}
             }
         },
         methods: {
+            clearDatas () {
+                this.checked = 0
+            },
             returnVote () {
                 this.$router.go(-1)
+            },
+            handleClickCheck () {
+                if (this.$store.state.total > 9) {
+                    return
+                }
+                this.$store.commit('addTotal')
+                this.$store.commit('addArr', this.id)
+                this.arr = this.$store.state.arr
+                this.checked = 1
+            },
+            handleClickCancel () {
+                this.$store.commit('subTotal')
+                this.$store.commit('subArr', this.id)
+                this.arr = this.$store.state.arr
+                this.checked = 0
+            },
+            // 获取数据
+            _getDetailList () {
+                axios.post('/api/index.php?actname=getvoteitem&id='+this.$route.params.id).then((res) => {
+                    if (res.data.errcode == "0000") {
+                        this.detailObj = res.data.data
+                        // console.log(this.detailObj)
+                    }
+                }).catch(function (error) {
+                    // 请求失败
+                })
             }
         },
         created () {
-            
+            this._getDetailList()
+            this.arr = this.$store.state.arr
+            this.id = this.$route.params.id
+            for (let i=0;i<this.arr.length;i++) {
+                if (this.arr[i] === this.$route.params.id) {
+                    this.checked = 1
+                }
+            }
         },
         components: {VShop}
     }

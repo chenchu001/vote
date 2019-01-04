@@ -19,11 +19,13 @@ export default new Vuex.Store({
         },
         addArr (state, id) {
             state.arr.push(id)
-            console.log(state.arr)
         },
         subArr (state, id) {
             state.arr.remove(id)
-            console.log(state.arr)
+        },
+        clearData (state) {
+            state.arr = []
+            state.total = 0
         }
     }
 })

@@ -6,7 +6,7 @@
             <h5>活动目的</h5>
             <p class="desc">为展示新时代湖北药品监管工作取得的新成效，提升药品监管工作的公众参与度，更好地促进药品安全社会共享共治，湖北省药品监督管理局决定开展“2018年度药品监管十件大事”网络评选活动。</p>
             <h5>主办单位</h5>
-            <p class="desc">湖北省食品药品监督管理局</p>
+            <p class="desc">湖北省药品监督管理局</p>
         </div>
         <div class="footer">
             <router-link to="/vote" tag="div" class="item active">
@@ -28,6 +28,7 @@
 <script>
     import VBanner from 'base/v-banner/v-banner'
     import VClassify from 'base/v-classify/v-classify'
+    import axios from 'axios'
 
     export default {
         name: "index",
@@ -36,7 +37,19 @@
 
             }
         },
-        components: {VBanner, VClassify}
+        methods: {
+            _getVisitList () {
+                axios.post('/api/index.php?actname=addvisit').then((res) => {
+                    
+                }).catch(function (error) {
+                    
+                })
+            }
+        },
+        components: {VBanner, VClassify},
+        created () {
+            this._getVisitList() 
+        }
     }
 </script>
 
@@ -64,13 +77,13 @@
                 line-height: 150%
                 text-align: justify
         .footer
-            width: 7.5rem
+            width: 8.3rem
             height: 1.14rem
             background: #0255c7
             position: fixed
             bottom: 0
             left: 50%
-            margin-left: -3.75rem
+            margin-left: -4.15rem
             display: flex
             .item
                 display: flex

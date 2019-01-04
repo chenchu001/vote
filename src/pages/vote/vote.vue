@@ -19,7 +19,7 @@
                         <span class="text">投票数</span>
                     </div>
                     <div class="bottom">
-                        <span class="text">0</span>票
+                        <span class="text">{{totalvote}}</span>票
                     </div>
                 </div>
                 <div class="item">
@@ -28,7 +28,7 @@
                         <span class="text">访问量</span>
                     </div>
                     <div class="bottom">
-                        <span class="text">0</span>
+                        <span class="text">{{totalvisit}}</span>
                     </div>
                 </div>
             </div>
@@ -57,9 +57,8 @@
                             <span class="piao">{{item.vcount}}</span>票
                         </div>
                         <div class="right">
-                            <span class="text" @click.stop="handleClickCheck(index, item.id)">选择</span>
-                            <!-- <span class="text" v-show="item.checked == 0" @click.stop="handleClickCheck(index, item.id)">选择</span> -->
-                            <!-- <span class="text-checked" v-show="item.checked == 1" @click.stop="handleClickCancel(index, item.id)">已选择</span> -->
+                            <span class="text-checked" v-if="checkselect(item.id)" @click.stop="handleClickCancel(index, item.id)">已选择</span>
+                            <span class="text" v-else @click.stop="handleClickCheck(index, item.id)">选择</span>
                         </div>
                     </div>
                 </div>
@@ -67,7 +66,7 @@
         </ul>
         <!-- home -->
         <a href="javascript:;" class="home" @click.stop="returnHome"></a>
-        <v-shop></v-shop>
+        <v-shop v-on:clearDatas="clearDatas"></v-shop>
     </div>
 </template>
 
@@ -82,26 +81,38 @@
             return {
                 voteArr: [],
                 arr: [],
-                total: 0
+                total: 0,
+                totalvisit: 0,
+                totalvote: 0
             }
         },
         methods: {
-            handleClickCheck (index, id) {
-                for(let i=0;i<voteArr.length;i++) {
-                    if (vateArr[i].id === id) {
-                        
+            clearDatas () {
+                this.arr = this.$store.state.arr
+                this.checkselect()
+            },
+            checkselect(id){
+                 for(var i in this.arr){
+                    if(this.arr[i]==id){
+                        return true
                     }
                 }
-                this.voteArr[index].checked = 1
-                this.total++
+                return false
+            },
+            handleClickCheck (index, id) {
+                if (this.$store.state.total > 9) {
+                    return
+                }
                 this.$store.commit('addTotal')
                 this.$store.commit('addArr', id)
+                this.arr = this.$store.state.arr
+                this.checkselect(id)
             },
             handleClickCancel (index, id) {
-                this.voteArr[index].checked = 0
-                this.total--
                 this.$store.commit('subTotal')
                 this.$store.commit('subArr', id)
+                this.arr = this.$store.state.arr
+                this.checkselect(id)
             },
             returnHome () {
                 this.$router.push({path: '/index'})
@@ -114,12 +125,23 @@
             // 获取数据
             _getVoteList () {
                 axios.post('/api/index.php?actname=getvotelist').then((res) => {
-                    console.log(res)
                     if (res.data.errcode == "0000") {
                         this.voteArr = res.data.data
                     }
                 }).catch(function (error) {
                     // 请求失败
+                })
+            },
+            // 获取访问量
+            _getList () {
+                axios.post('/api/index.php?actname=getvisitinfo').then((res) => {
+                    if (res.data.errcode === "0000") {
+                        res = res.data.data
+                        this.totalvisit = res.totalvisit
+                        this.totalvote = res.totalvote
+                    }
+                }).catch(function (error) {
+                    
                 })
             }
         },
@@ -137,11 +159,8 @@
                 } 
             }
             this._getVoteList()
-        },
-        watch: {
-            arr (newVal) {
-                
-            }
+            this._getList()
+            this.arr = this.$store.state.arr
         },
         components: {VBanner, VShop}
     }

@@ -13,7 +13,7 @@
                         <span class="text">{{index+1}}</span>
                     </div>
                     <span class="middle">{{list.title}}</span>
-                    <span class="right">{{list.number}}票</span>
+                    <span class="right">{{list.vcount}}票</span>
                 </li>
             </ul>
         </div>
@@ -27,6 +27,7 @@
     import VBanner from 'base/v-banner/v-banner'
     import VClassify from 'base/v-classify/v-classify'
     import VFooter from 'base/v-footer/v-footer'
+    import axios from 'axios'
 
     export default {
         name: "ranking",
@@ -79,9 +80,21 @@
         methods: {
             returnHome () {
                 this.$router.push({path: '/index'})
+            },
+            _getRankList () {
+                axios.post('/api/index.php?actname=getvotelist&order=vcount&sorts=desc').then((res) => {
+                    if (res.data.errcode == "0000") {
+                        this.rankArr = res.data.data
+                    }
+                }).catch(function (error) {
+                    // 请求失败
+                })
             }
         },
-        components: {VBanner, VClassify, VFooter}
+        components: {VBanner, VClassify, VFooter},
+        created () {
+            this._getRankList()
+        }
     }
 </script>
 
@@ -99,7 +112,7 @@
             bottom: 1.5rem
         .ranking-info
             width: 100%
-            padding: 0 .4rem 4rem
+            padding: 0 .4rem 3rem
             box-sizing: border-box
             .title
                 margin-top: .32rem
